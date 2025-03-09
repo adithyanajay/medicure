@@ -1,0 +1,2 @@
+pip install fastapi motor pymongo bcrypt jwt python-dotenv email-validator
+pip install fastapi uvicorn motor pymongo bcrypt python-jose python-dotenv
