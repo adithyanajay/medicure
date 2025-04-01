@@ -1,65 +1,149 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from routes.users import router as user_router
-from routes.protected import router as protected_router
-from database import check_db_connection
-from ml_model.predictor import hybrid_predict  # ✅ Import refined ML function
-
-
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Dict, Any, Union
+import uvicorn
+import logging
+import traceback
 
+from ml_model.predictor import hybrid_predict, get_symptom_suggestions
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Define request models
 class SymptomsRequest(BaseModel):
     symptoms: List[str]
+    denied_symptoms: Optional[List[str]] = []
 
+class NextSymptomRequest(BaseModel):
+    current_symptoms: List[str]
+    denied_symptoms: Optional[List[str]] = []
+    predicted_disease: Optional[str] = None
+    alternative_diseases: Optional[List[str]] = []
+    confidence_threshold: Optional[float] = 0.5
 
-
+# Initialize FastAPI
 app = FastAPI(
-    title="Medical App Backend",
+    title="MediCure API",
     version="1.0.0",
-    description="Authentication system using FastAPI & MongoDB Atlas"
+    description="API for MediCure - An AI-powered Medical Assistant"
 )
 
-# CORS Middleware
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
 )
 
-# Register Routes
-app.include_router(user_router, prefix="/auth", tags=["Authentication"])
-app.include_router(protected_router, prefix="/protected", tags=["Protected"])
-
-# Root API Route
-@app.get("/", tags=["Root"])
+@app.get("/")
 async def root():
-    return {"message": "Welcome to the Medical App Backend!"}
+    return {"message": "Welcome to MediCure API. Use /predict endpoint to get a diagnosis."}
 
-# ✅ Updated ML Prediction API with hybrid model
-@app.post("/predict", tags=["ML Prediction"])
-async def get_prediction(request: SymptomsRequest):
+@app.post("/predict")
+async def predict(request: SymptomsRequest):
+    """
+    Make a prediction based on symptoms
+    """
     try:
-        if not request.symptoms:
-            raise HTTPException(status_code=400, detail="No symptoms provided!")
-
-        # print(f"Received Symptoms: {request.symptoms}")  # ✅ Debugging Step
-
+        # Log received symptoms
+        logger.info(f"Received Symptoms: {request.symptoms}")
+        logger.info(f"Denied Symptoms: {request.denied_symptoms}")
         
-        result = hybrid_predict(request.symptoms)
-
-        # print(f"Prediction Result: {result}")  # ✅ Debugging Step
-
-        return {"prediction": result}
-
+        # Type checking
+        if not all(isinstance(s, str) for s in request.symptoms):
+            logger.error("Invalid symptom type detected")
+            raise HTTPException(status_code=400, detail="All symptoms must be strings")
+            
+        # Log symptom types for debugging
+        logger.info(f"Symptoms types: {[type(s) for s in request.symptoms]}")
+        
+        # Get prediction
+        prediction_result = hybrid_predict(
+            symptoms=request.symptoms,
+            denied_symptoms=request.denied_symptoms
+        )
+        
+        # Get suggested next symptoms based on prediction
+        suggested_symptoms = get_symptom_suggestions(
+            current_symptoms=request.symptoms,
+            denied_symptoms=request.denied_symptoms,
+            predicted_disease=prediction_result["Most Probable Disease"],
+            alternative_diseases=prediction_result["Possible Alternatives"],
+            confidence_threshold=prediction_result["Confidence"]
+        )
+        
+        # Return structured response
+        response = {
+            "prediction": prediction_result,
+            "suggested_symptoms": suggested_symptoms
+        }
+        
+        logger.info(f"Prediction Response: {response}")
+        return response
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error in prediction: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
+@app.post("/next-symptoms")
+async def next_symptoms(request: NextSymptomRequest):
+    """
+    Get suggested next symptoms based on current diagnosis state
+    """
+    try:
+        # If no current symptoms, suggest starting symptoms
+        if not request.current_symptoms:
+            return {
+                "suggested_symptoms": ["fever", "cough", "headache"]
+            }
+        
+        # Get current prediction for symptom guidance
+        prediction_result = hybrid_predict(
+            symptoms=request.current_symptoms,
+            denied_symptoms=request.denied_symptoms
+        )
+        
+        # Get suggested next symptoms
+        suggested_symptoms = get_symptom_suggestions(
+            current_symptoms=request.current_symptoms,
+            denied_symptoms=request.denied_symptoms,
+            predicted_disease=prediction_result["Most Probable Disease"],
+            alternative_diseases=prediction_result["Possible Alternatives"],
+            confidence_threshold=prediction_result.get("Confidence", 0.5)
+        )
+        
+        # Prepare response
+        response = {
+            "prediction": prediction_result,
+            "suggested_symptoms": suggested_symptoms
+        }
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error getting next symptoms: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Error suggesting symptoms: {str(e)}")
 
-# ✅ Call check_db_connection() when the app starts
+# Startup event to check ML models
 @app.on_event("startup")
-async def startup_db_check():
-    await check_db_connection()
+async def startup_event():
+    logger.info("MediCure API started")
+    logger.info("Checking ML models...")
+    try:
+        # Test the ML models with a simple prediction
+        test_result = hybrid_predict(["fever"])
+        logger.info(f"Test prediction successful: {test_result}")
+    except Exception as e:
+        logger.error(f"Error testing ML models: {str(e)}")
+        logger.error(traceback.format_exc())
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 

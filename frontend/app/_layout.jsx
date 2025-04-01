@@ -13,6 +13,15 @@ export default function Layout() {
       }}
     >
       <Tabs.Screen
+        name="questionnaire"
+        options={{
+          title: "Symptom Checker",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="stethoscope" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="mental-health"
         options={{
           title: "Mental Health",
@@ -21,7 +30,7 @@ export default function Layout() {
           ),
         }}
       />
-       <Tabs.Screen
+      <Tabs.Screen
         name="appointments/index"
         options={{ tabBarLabel: "Appointments", tabBarIcon: ({ color }) => <FontAwesome name="calendar" size={24} color={color} /> }}
       />
