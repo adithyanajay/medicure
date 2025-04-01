@@ -46,49 +46,69 @@ def pad_symptoms_array(symptoms_array, target_features):
         return np.hstack((symptoms_array, padding))
     return symptoms_array
 
-# Define a comprehensive disease-symptom mapping
+# Define a comprehensive disease-symptom mapping (optimized for most common diseases)
 disease_symptom_map = {
+    # Respiratory diseases
     "Common Cold": ["cough", "runny_nose", "sore_throat", "mild_fever", "sneezing", "congestion"],
     "Influenza": ["high_fever", "headache", "chills", "fatigue", "body_aches", "cough", "sore_throat"],
     "Pneumonia": ["cough", "high_fever", "chest_pain", "shortness_of_breath", "fatigue", "phlegm"],
     "Bronchitis": ["cough", "phlegm", "fatigue", "slight_fever", "chest_discomfort", "wheezing"],
     "Asthma": ["wheezing", "shortness_of_breath", "chest_tightness", "cough", "rapid_breathing"],
+    
+    # ENT conditions
     "Allergic Rhinitis": ["sneezing", "runny_nose", "itchy_eyes", "nasal_congestion", "watery_eyes"],
     "Sinusitis": ["facial_pain", "nasal_congestion", "headache", "thick_nasal_discharge", "reduced_smell"],
+    
+    # Infectious diseases
     "Malaria": ["high_fever", "sweating", "chills", "headache", "nausea", "vomiting", "muscle_pain"],
     "Dengue": ["high_fever", "severe_headache", "joint_pain", "rash", "bleeding_gums", "eye_pain"],
     "Typhoid": ["high_fever", "weakness", "abdominal_pain", "headache", "diarrhea", "constipation", "rash"],
     "Tuberculosis": ["cough", "bloody_sputum", "night_sweats", "weight_loss", "fatigue", "fever", "chest_pain"],
+    
+    # Digestive system
     "GERD": ["heartburn", "chest_pain", "difficulty_swallowing", "regurgitation", "sour_taste", "cough"],
     "Peptic Ulcer": ["burning_stomach_pain", "bloating", "heartburn", "nausea", "weight_loss", "vomiting"],
     "Gastroenteritis": ["diarrhea", "abdominal_cramps", "nausea", "vomiting", "fever", "dehydration"],
+    
+    # Liver conditions
     "Jaundice": ["yellowing_of_skin", "dark_urine", "pale_stools", "fatigue", "abdominal_pain", "weight_loss"],
     "Hepatitis": ["fatigue", "nausea", "abdominal_pain", "loss_of_appetite", "yellowing_of_skin", "dark_urine"],
+    
+    # Neurological
     "Migraine": ["severe_headache", "nausea", "sensitivity_to_light", "blurred_vision", "fatigue", "aura"],
+    
+    # Cardiovascular
     "Hypertension": ["headache", "shortness_of_breath", "dizziness", "chest_pain", "blurred_vision", "nose_bleeds"],
+    
+    # Endocrine
     "Diabetes": ["increased_thirst", "frequent_urination", "hunger", "fatigue", "blurred_vision", "weight_loss"],
+    
+    # Musculoskeletal
     "Arthritis": ["joint_pain", "stiffness", "swelling", "decreased_range_of_motion", "redness", "joint_warmth"],
     "Osteoporosis": ["back_pain", "loss_of_height", "stooped_posture", "bone_fracture", "neck_pain"],
+    
+    # Genitourinary
     "Urinary Tract Infection": ["burning_urination", "frequent_urination", "cloudy_urine", "strong_odor", "pelvic_pain", "blood_in_urine"],
+    
+    # Dermatological
     "Psoriasis": ["red_patches", "silver_scales", "dry_skin", "itching", "swollen_joints", "thick_nails"],
     "Eczema": ["itchy_skin", "red_rash", "small_bumps", "thickened_skin", "dry_skin", "sensitive_skin"],
     "Acne": ["pimples", "whiteheads", "blackheads", "skin_inflammation", "oily_skin", "scarring"],
     "Drug Reaction": ["skin_rash", "itching", "fever", "facial_swelling", "joint_pain", "shortness_of_breath"],
     "Fungal infection": ["itching", "rash", "skin_lesion", "scaly_skin", "discoloration", "swelling"],
+    
+    # Metabolic
     "Hypoglycemia": ["hunger", "shaking", "sweating", "dizziness", "confusion", "anxiety", "weakness"],
     "Hyperthyroidism": ["weight_loss", "rapid_heartbeat", "increased_appetite", "tremor", "sweating", "fatigue"],
     "Hypothyroidism": ["fatigue", "weight_gain", "cold_sensitivity", "dry_skin", "constipation", "depression"],
+    
+    # Other common conditions
     "Impetigo": ["red_sores", "blisters", "itching", "skin_rash", "swollen_lymph_nodes", "fever"],
     "Paralysis (brain hemorrhage)": ["weakness", "numbness", "confusion", "headache", "difficulty_speaking", "vision_problems"],
-    "AIDS": ["weight_loss", "fever", "night_sweats", "fatigue", "swollen_lymph_nodes", "frequent_infections"],
     "Cervical spondylosis": ["neck_pain", "stiffness", "headache", "tingling", "numbness_in_arms", "weakness"],
-    "Chronic cholestasis": ["itching", "fatigue", "yellowing_skin", "dark_urine", "abdominal_pain", "nausea"],
-    "Alcoholic hepatitis": ["jaundice", "abdominal_pain", "nausea", "vomiting", "fever", "fatigue"],
-    "Dimorphic hemmorhoids(piles)": ["bleeding", "pain", "swelling", "itching", "constipation", "painful_bowel_movements"],
     "Heart attack": ["chest_pain", "shortness_of_breath", "cold_sweat", "nausea", "arm_pain", "dizziness"],
     "Varicose veins": ["visible_veins", "leg_pain", "swelling", "heaviness", "itching", "cramping"],
-    "Osteoarthristis": ["joint_pain", "stiffness", "swelling", "reduced_mobility", "grating_sensation", "bone_spurs"],
-    "Acne": ["pimples", "blackheads", "whiteheads", "inflammation", "pustules", "nodules"]
+    "Osteoarthristis": ["joint_pain", "stiffness", "swelling", "reduced_mobility", "grating_sensation", "bone_spurs"]
 }
 
 # Add more common respiratory symptoms to relevant diseases
@@ -104,7 +124,15 @@ primary_symptoms = {
     "Pneumonia": ["cough", "high_fever", "chest_pain", "shortness_of_breath"],
     "Dengue": ["high_fever", "severe_headache", "joint_pain", "rash"],
     "Tuberculosis": ["persistent_cough", "bloody_sputum", "weight_loss", "night_sweats"],
-    "Cervical spondylosis": ["neck_pain", "stiffness", "numbness_in_arms", "tingling"]
+    "Cervical spondylosis": ["neck_pain", "stiffness", "numbness_in_arms", "tingling"],
+    "Influenza": ["high_fever", "cough", "body_aches", "fatigue", "headache"],
+    "Jaundice": ["yellowing_of_skin", "dark_urine", "fatigue"],
+    "Malaria": ["high_fever", "chills", "sweating", "headache"],
+    "Hepatitis": ["yellowing_of_skin", "fatigue", "abdominal_pain", "dark_urine"],
+    "Migraine": ["severe_headache", "sensitivity_to_light", "nausea"],
+    "Hypertension": ["headache", "dizziness", "nose_bleeds"],
+    "Diabetes": ["increased_thirst", "frequent_urination", "fatigue", "weight_loss"],
+    "Gastroenteritis": ["diarrhea", "vomiting", "nausea", "abdominal_cramps"]
 }
 
 # Fill in primary symptoms for any diseases not explicitly defined
@@ -426,7 +454,14 @@ def get_symptom_suggestions(current_symptoms=None, denied_symptoms=None, predict
                 if len(suggestions) >= 3:
                     break
     
-    # Return top 3 suggestions
-    return suggestions[:3]
+    # Return top 3 suggestions (ensure no duplicates)
+    unique_suggestions = []
+    for s in suggestions:
+        if s not in unique_suggestions:
+            unique_suggestions.append(s)
+            if len(unique_suggestions) >= 3:
+                break
+    
+    return unique_suggestions[:3]
 
 

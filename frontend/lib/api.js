@@ -1,7 +1,8 @@
 // API functions for MediCure
 
 // Base URL for the API
-const API_BASE_URL = 'http://localhost:8000';
+// Change from localhost to your computer's IP address for mobile compatibility
+const API_BASE_URL = 'http://192.168.1.8:8000'; // Your computer's actual IP address
 
 /**
  * Predicts disease based on symptoms
