@@ -82,10 +82,18 @@ export default function MentalHealthScreen() {
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.response.content.message,
+        text: data.message,
         sender: 'bot',
         timestamp: new Date().toLocaleTimeString(),
-        response: data.response
+        response: {
+          type: data.emotion,
+          is_emergency: data.is_emergency,
+          content: {
+            message: data.message,
+            activities: data.activities,
+            resources: data.resources
+          }
+        }
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -105,7 +113,7 @@ export default function MentalHealthScreen() {
 
   const renderMessage = (message: Message) => {
     const isBot = message.sender === 'bot';
-    const isEmergency = message.response?.type === 'crisis';
+    const isEmergency = message.response?.is_emergency || message.response?.type === 'crisis';
     
     return (
       <View
@@ -177,6 +185,11 @@ export default function MentalHealthScreen() {
               {message.response.content.resources.map((resource: string, index: number) => {
                 // Remove HTML tags from resource text if present
                 const cleanResource = resource.replace(/<[^>]*>/g, '');
+                
+                // Extract phone number if it's an emergency number
+                const phoneMatch = cleanResource.match(/(\d{3}[-.]?\d{3}[-.]?\d{4}|\d{3})/);
+                const phone = phoneMatch ? phoneMatch[0] : null;
+                
                 return (
                   <Text 
                     key={index} 
@@ -187,8 +200,12 @@ export default function MentalHealthScreen() {
                       textDecorationLine: 'underline'
                     }}
                     onPress={() => {
-                      const url = cleanResource.split(': ')[1];
-                      if (url) Linking.openURL(url);
+                      if (phone) {
+                        Linking.openURL(`tel:${phone}`);
+                      } else {
+                        const url = cleanResource.split(': ')[1];
+                        if (url) Linking.openURL(url);
+                      }
                     }}
                   >
                     {cleanResource}
