@@ -20,8 +20,8 @@ const EMERGENCY_NUMBERS = {
 };
 
 const API_URL = Platform.select({
-  web: 'http://127.0.0.1:8000',
-  default: 'http://127.0.0.1:8000',
+  web: 'http://localhost:8000',
+  default: 'http://10.0.2.2:8000', // Android emulator needs this special IP
 });
 
 export default function MentalHealthScreen() {
@@ -68,7 +68,7 @@ export default function MentalHealthScreen() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/mental-health/chat', {
+      const response = await fetch(`${API_URL}/mental-health/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,6 +105,7 @@ export default function MentalHealthScreen() {
 
   const renderMessage = (message: Message) => {
     const isBot = message.sender === 'bot';
+    const isEmergency = message.response?.type === 'crisis';
     
     return (
       <View
@@ -124,52 +125,76 @@ export default function MentalHealthScreen() {
             borderBottomRightRadius: isBot ? 16 : 4,
           }}
         >
-          <Text style={{ color: isBot ? '#000' : '#fff' }}>{message.text}</Text>
+          <Text style={{ 
+            color: isEmergency ? '#ff0000' : (isBot ? '#000' : '#fff'),
+            fontWeight: isEmergency ? 'bold' : 'normal'
+          }}>
+            {message.text}
+          </Text>
           
           {/* Render activities if present */}
           {isBot && message.response?.content?.activities && (
-            <View style={{ marginTop: 8, borderTopWidth: 1, borderTopColor: '#ddd', paddingTop: 8 }}>
-              <Text style={{ fontWeight: '600', marginBottom: 4, color: '#444' }}>
+            <View style={{ 
+              marginTop: 8, 
+              borderTopWidth: 1, 
+              borderTopColor: isEmergency ? '#ff0000' : '#ddd', 
+              paddingTop: 8 
+            }}>
+              <Text style={{ 
+                fontWeight: '600', 
+                marginBottom: 4, 
+                color: isEmergency ? '#ff0000' : '#444'
+              }}>
                 Suggested Activities:
               </Text>
               {message.response.content.activities.map((activity: string, index: number) => (
-                <Text key={index} style={{ color: '#666', marginVertical: 2 }}>{activity}</Text>
+                <Text key={index} style={{ 
+                  color: isEmergency ? '#ff0000' : '#666',
+                  marginVertical: 2,
+                  fontWeight: isEmergency ? '500' : 'normal'
+                }}>
+                  {activity}
+                </Text>
               ))}
             </View>
           )}
 
           {/* Render resources if present */}
           {isBot && message.response?.content?.resources && (
-            <View style={{ marginTop: 8, borderTopWidth: 1, borderTopColor: '#ddd', paddingTop: 8 }}>
-              <Text style={{ fontWeight: '600', marginBottom: 4, color: '#444' }}>
+            <View style={{ 
+              marginTop: 8, 
+              borderTopWidth: 1, 
+              borderTopColor: isEmergency ? '#ff0000' : '#ddd', 
+              paddingTop: 8 
+            }}>
+              <Text style={{ 
+                fontWeight: '600', 
+                marginBottom: 4, 
+                color: isEmergency ? '#ff0000' : '#444'
+              }}>
                 Helpful Resources:
               </Text>
-              {message.response.content.resources.map((resource: string, index: number) => (
-                <Text 
-                  key={index} 
-                  style={{ color: '#0066cc', marginVertical: 2, textDecorationLine: 'underline' }}
-                  onPress={() => Linking.openURL(resource.split(' - ')[1])}
-                >
-                  {resource}
-                </Text>
-              ))}
-            </View>
-          )}
-
-          {/* Render emergency numbers if present */}
-          {isBot && message.response?.type === 'emergency' && (
-            <View style={{ marginTop: 8, borderTopWidth: 1, borderTopColor: '#ff0000', paddingTop: 8 }}>
-              <Text style={{ color: '#ff0000', fontWeight: 'bold', marginBottom: 4 }}>
-                Emergency Contact Numbers:
-              </Text>
-              {message.response.content.emergency_numbers.numbers.map((number: string, index: number) => (
-                <Text 
-                  key={index} 
-                  style={{ color: '#ff0000', fontWeight: '500', marginVertical: 2 }}
-                >
-                  {number}
-                </Text>
-              ))}
+              {message.response.content.resources.map((resource: string, index: number) => {
+                // Remove HTML tags from resource text if present
+                const cleanResource = resource.replace(/<[^>]*>/g, '');
+                return (
+                  <Text 
+                    key={index} 
+                    style={{ 
+                      color: isEmergency ? '#ff0000' : '#0066cc',
+                      marginVertical: 2,
+                      fontWeight: isEmergency ? '500' : 'normal',
+                      textDecorationLine: 'underline'
+                    }}
+                    onPress={() => {
+                      const url = cleanResource.split(': ')[1];
+                      if (url) Linking.openURL(url);
+                    }}
+                  >
+                    {cleanResource}
+                  </Text>
+                );
+              })}
             </View>
           )}
         </View>
