@@ -1,19 +1,26 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 // import { useAuth } from "../../context/AuthContext";
 
 export default function SignupScreen({ navigation }) {
+
+
+  const router = useRouter();
+  
+    const handleNavigation = (route) => {
+      router.push(route);
+    };
+
+
+
 //   const { signup } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-//   const handleSignup = () => {
-//     if (fullName && email && password && password === confirmPassword) {
-//       signup({ fullName, email }); // Mock signup, replace with API call
-//     }
-//   };
+
 
   return (
     <View className="flex-1 bg-[#F8FAFF] px-6 justify-center items-center">
@@ -62,7 +69,7 @@ export default function SignupScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Login")} className="mt-6">
+      <TouchableOpacity onPress={() => handleNavigation('screens/Auth/LoginScreen')} className="mt-6">
         <Text className="text-blue-500">Already have an account? <Text className="font-bold">Log In</Text></Text>
       </TouchableOpacity>
     </View>

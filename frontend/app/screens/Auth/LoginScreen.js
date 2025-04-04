@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "expo-router";
 
 export default function LoginScreen({ navigation }) {
+
+    const router = useRouter();
+  
+    const handleNavigation = (route) => {
+      router.push(route);
+    };
+
+
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,7 +60,7 @@ export default function LoginScreen({ navigation }) {
 
       
 
-      <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")} className="mt-6">
+      <TouchableOpacity onPress={() => handleNavigation('screens/Auth/SignupScreen')} className="mt-6">
         <Text className="text-blue-500">Don't have an account? <Text className="font-bold">Sign Up</Text></Text>
       </TouchableOpacity>
     </View>
