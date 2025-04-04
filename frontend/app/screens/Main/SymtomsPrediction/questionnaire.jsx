@@ -33,7 +33,11 @@ const QuestionnaireScreen = () => {
   useEffect(() => {
     if (inputSymptom.trim()) {
       const filtered = allSymptoms.filter(symptom => 
-        symptom.toLowerCase().includes(inputSymptom.toLowerCase())
+        symptom.toLowerCase().includes(inputSymptom.toLowerCase()) ||
+        // Add this line to match "mild" to "mild fever", etc.
+        inputSymptom.toLowerCase().split(' ').some(word => 
+          word.length > 2 && symptom.toLowerCase().includes(word)
+        )
       );
       setFilteredSymptoms(filtered);
     } else {
@@ -96,6 +100,7 @@ const QuestionnaireScreen = () => {
     setError(null);
     
     try {
+      console.log('Fetching prediction for symptoms:', symptoms);
       const result = await predictDisease(symptoms, denied);
       
       // Track diagnosis changes
@@ -126,12 +131,157 @@ const QuestionnaireScreen = () => {
         setStep(2);
       }
       
+      // Add helpful descriptions for common conditions
+      if (result.prediction["Most Probable Disease"]) {
+        const disease = result.prediction["Most Probable Disease"];
+        let description = "";
+        
+        switch(disease) {
+          case "Common Cold":
+            description = "Rest, fluids, and over-the-counter medications can help relieve symptoms.";
+            break;
+          case "Influenza":
+            description = "Rest, fluids, and antiviral medications if prescribed by a doctor.";
+            break;
+          case "Allergic Rhinitis":
+            description = "Avoiding allergens and antihistamines can help manage symptoms.";
+            break;
+          case "Gastroenteritis":
+            description = "Stay hydrated and consider a BRAT diet (bananas, rice, applesauce, toast).";
+            break;
+          case "Urinary Tract Infection":
+            description = "Drink plenty of water and consult a doctor for antibiotics if needed.";
+            break;
+          case "Migraine":
+            description = "Rest in a dark, quiet room and consider over-the-counter pain relievers.";
+            break;
+          case "Jaundice":
+            description = "Seek medical attention as this may indicate liver problems requiring treatment.";
+            break;
+          default:
+            description = "Consult with a healthcare provider for proper treatment.";
+        }
+        
+        setFinalPrediction({
+          ...result.prediction,
+          description
+        });
+      }
+      
     } catch (err) {
-      setError('Error getting prediction. Please try again.');
-      console.error(err);
+      console.error('API Error details:', err);
+      
+      // Set a user-friendly error message
+      setError('Connection error. Please check your network and try again.');
+      
+      // If we already have some symptoms, use a fallback prediction
+      if (symptoms.length > 0 && !currentPrediction) {
+        const fallback = getFallbackDiagnosis(symptoms);
+        setCurrentPrediction({
+          "Most Probable Disease": `${fallback.disease} (Offline Mode)`,
+          "Possible Alternatives": ["Network connection issue", "Unable to reach server"],
+          "Confidence": fallback.confidence,
+          "description": fallback.description || "If symptoms persist, please consult a healthcare provider."
+        });
+        
+        // Use fallback prediction to allow user to continue
+        setCurrentSymptomOptions(getFallbackSymptoms(symptoms));
+        setConfidence(fallback.confidence);
+        
+        if (symptoms.length >= 1 && step === 1) {
+          setStep(2);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Fallback function to suggest a basic diagnosis when offline
+  const getFallbackDiagnosis = (symptoms) => {
+    // Enhanced fallback symptom-disease matching
+    const symptomSets = {
+      cold: ["cough", "runny_nose", "sneezing", "stuffy_nose", "sore_throat", "congestion"],
+      flu: ["fever", "body_aches", "chills", "headache", "fatigue", "cough"],
+      allergy: ["sneezing", "itchy_eyes", "watery_eyes", "runny_nose", "nasal_congestion"],
+      headache: ["headache", "pain", "migraine", "pressure"],
+      stomach: ["nausea", "vomiting", "diarrhea", "abdominal_pain", "stomach_pain"],
+      skin: ["rash", "itching", "swelling", "redness", "spots"]
+    };
+
+    // Count symptom matches for each condition
+    const matches = {};
+    for (const [condition, conditionSymptoms] of Object.entries(symptomSets)) {
+      matches[condition] = symptoms.filter(s => 
+        conditionSymptoms.some(cs => s.toLowerCase().includes(cs.toLowerCase()))
+      ).length;
+    }
+
+    // Find the best match
+    let bestMatch = "unknown";
+    let bestScore = 0;
+    for (const [condition, score] of Object.entries(matches)) {
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = condition;
+      }
+    }
+
+    // Return appropriate diagnosis based on best match
+    if (bestScore === 0) return { disease: "Unknown", confidence: 0.2 };
+
+    switch (bestMatch) {
+      case "cold":
+        return { 
+          disease: "Common Cold", 
+          confidence: Math.min(0.7, 0.4 + (bestScore * 0.1)),
+          description: "Rest, fluids, and over-the-counter medications can help relieve symptoms." 
+        };
+      case "flu":
+        return { 
+          disease: "Influenza", 
+          confidence: Math.min(0.7, 0.4 + (bestScore * 0.1)),
+          description: "Rest, fluids, and antiviral medications if prescribed by a doctor." 
+        };
+      case "allergy":
+        return { 
+          disease: "Allergic Rhinitis", 
+          confidence: Math.min(0.7, 0.4 + (bestScore * 0.1)),
+          description: "Avoiding allergens and antihistamines can help manage symptoms." 
+        };
+      case "headache":
+        return { 
+          disease: "Tension Headache", 
+          confidence: Math.min(0.6, 0.3 + (bestScore * 0.1)),
+          description: "Rest, hydration, and over-the-counter pain relievers may help." 
+        };
+      case "stomach":
+        return { 
+          disease: "Gastroenteritis", 
+          confidence: Math.min(0.6, 0.3 + (bestScore * 0.1)),
+          description: "Stay hydrated and consider a BRAT diet (bananas, rice, applesauce, toast)." 
+        };
+      case "skin":
+        return { 
+          disease: "Skin Irritation", 
+          confidence: Math.min(0.5, 0.3 + (bestScore * 0.1)),
+          description: "Avoid irritants and consider over-the-counter anti-itch creams." 
+        };
+      default:
+        return { 
+          disease: "Unknown Condition", 
+          confidence: 0.3,
+          description: "If symptoms persist, please consult a healthcare provider." 
+        };
+    }
+  };
+
+  // Fallback symptoms suggestions when offline
+  const getFallbackSymptoms = (symptoms) => {
+    const commonSymptoms = ["fever", "cough", "headache", "fatigue", "sore_throat", "nausea"];
+    return commonSymptoms
+      .filter(s => !symptoms.includes(s) && !deniedSymptoms.includes(s))
+      .slice(0, 3);
   };
 
   // Handle when user selects a symptom option in step 2
@@ -567,6 +717,17 @@ const QuestionnaireScreen = () => {
               </Text>
             </View>
             
+            {finalPrediction.description && (
+              <View style={{ marginBottom: 15 }}>
+                <Text style={{ color: '#333', fontWeight: '500', marginBottom: 5 }}>
+                  Description:
+                </Text>
+                <Text style={{ color: '#555', fontSize: 14 }}>
+                  {finalPrediction.description}
+                </Text>
+              </View>
+            )}
+            
             <View style={{ marginBottom: 15 }}>
               <Text style={{ color: '#333', fontWeight: '500', marginBottom: 5 }}>
                 Alternative Possibilities:
@@ -660,4 +821,4 @@ const QuestionnaireScreen = () => {
   );
 };
 
-export default QuestionnaireScreen; 
+export default QuestionnaireScreen;

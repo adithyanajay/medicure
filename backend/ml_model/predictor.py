@@ -116,23 +116,35 @@ for disease in ["Common Cold", "Influenza", "Pneumonia", "Bronchitis", "Asthma"]
     if disease in disease_symptom_map:
         disease_symptom_map[disease].extend(["cough", "sore_throat", "fever"])
 
+# Enhance common disease mappings with more variations and symptoms
+disease_symptom_map["Common Cold"] = ["runny_nose", "stuffy_nose", "sneezing", "cough", "sore_throat", 
+                                     "mild_fever", "headache", "fatigue", "body_aches", "congestion"]
+disease_symptom_map["Influenza"] = ["high_fever", "fever", "cough", "body_aches", "fatigue", "headache", 
+                                   "chills", "sore_throat", "runny_nose", "congestion"]
+disease_symptom_map["Fever"] = ["elevated_temperature", "chills", "sweating", "headache", "muscle_aches",
+                               "dehydration", "weakness", "fatigue"]
+disease_symptom_map["Allergic Rhinitis"] = ["sneezing", "runny_nose", "nasal_congestion", "itchy_eyes", 
+                                          "watery_eyes", "itchy_nose", "itchy_throat"]
+
 # Define primary symptoms for each disease (most important diagnostic indicators)
 primary_symptoms = {
     "Urinary Tract Infection": ["burning_urination", "frequent_urination", "pelvic_pain", "cloudy_urine"],
     "Fungal infection": ["itching", "rash", "skin_lesion", "scaly_skin"],
-    "Common Cold": ["cough", "runny_nose", "sore_throat", "sneezing"],
+    "Common Cold": ["runny_nose", "cough", "sore_throat", "sneezing", "congestion"],
     "Pneumonia": ["cough", "high_fever", "chest_pain", "shortness_of_breath"],
     "Dengue": ["high_fever", "severe_headache", "joint_pain", "rash"],
     "Tuberculosis": ["persistent_cough", "bloody_sputum", "weight_loss", "night_sweats"],
     "Cervical spondylosis": ["neck_pain", "stiffness", "numbness_in_arms", "tingling"],
-    "Influenza": ["high_fever", "cough", "body_aches", "fatigue", "headache"],
+    "Influenza": ["high_fever", "fever", "cough", "body_aches", "fatigue", "headache"],
     "Jaundice": ["yellowing_of_skin", "dark_urine", "fatigue"],
     "Malaria": ["high_fever", "chills", "sweating", "headache"],
     "Hepatitis": ["yellowing_of_skin", "fatigue", "abdominal_pain", "dark_urine"],
     "Migraine": ["severe_headache", "sensitivity_to_light", "nausea"],
     "Hypertension": ["headache", "dizziness", "nose_bleeds"],
     "Diabetes": ["increased_thirst", "frequent_urination", "fatigue", "weight_loss"],
-    "Gastroenteritis": ["diarrhea", "vomiting", "nausea", "abdominal_cramps"]
+    "Gastroenteritis": ["diarrhea", "vomiting", "nausea", "abdominal_cramps"],
+    "Fever": ["elevated_temperature", "chills", "sweating", "headache"],
+    "Allergic Rhinitis": ["sneezing", "runny_nose", "itchy_eyes", "nasal_congestion"]
 }
 
 # Fill in primary symptoms for any diseases not explicitly defined
@@ -227,6 +239,32 @@ def hybrid_predict(symptoms, denied_symptoms=None):
                 "All Confidence Scores": {"Insufficient data": 0.1}
             }
         
+        # SPECIAL CASE: Handle common illnesses with simple symptom patterns
+        # This overrides the ML model when clear patterns are present
+        common_illness_match = None
+        common_illness_confidence = 0.0
+        
+        # Simple cold check
+        cold_symptoms = ["runny_nose", "cough", "sore_throat", "sneezing", "congestion", "stuffy_nose"]
+        cold_matches = sum(1 for s in symptoms if s in cold_symptoms)
+        if cold_matches >= 2 and cold_matches / len(symptoms) >= 0.5:
+            common_illness_match = "Common Cold"
+            common_illness_confidence = min(0.85, 0.5 + cold_matches * 0.1)
+        
+        # Simple flu check
+        flu_symptoms = ["fever", "high_fever", "cough", "body_aches", "fatigue", "headache", "chills"]
+        flu_matches = sum(1 for s in symptoms if s in flu_symptoms)
+        if flu_matches >= 2 and "fever" in symptoms and flu_matches / len(symptoms) >= 0.5:
+            common_illness_match = "Influenza"
+            common_illness_confidence = min(0.85, 0.6 + flu_matches * 0.08)
+            
+        # Simple allergy check
+        allergy_symptoms = ["sneezing", "runny_nose", "itchy_eyes", "watery_eyes", "itchy_nose", "nasal_congestion"]
+        allergy_matches = sum(1 for s in symptoms if s in allergy_symptoms)
+        if allergy_matches >= 2 and allergy_matches / len(symptoms) >= 0.6:
+            common_illness_match = "Allergic Rhinitis"
+            common_illness_confidence = min(0.85, 0.5 + allergy_matches * 0.1)
+        
         # Pad the array to match the expected features for both models
         nb_padded_array = pad_symptoms_array(symptoms_array, nb_expected_features)
         rf_padded_array = pad_symptoms_array(symptoms_array, rf_expected_features)
@@ -254,6 +292,13 @@ def hybrid_predict(symptoms, denied_symptoms=None):
             # Base confidence on probability score
             confidence = float(top_probs[i])
             
+            # Boost confidence for common diseases when symptoms match well
+            disease_str = str(disease)
+            if disease_str in ["Common Cold", "Influenza", "Allergic Rhinitis", "Fever"]:
+                overlap_score, primary_match = calc_symptom_overlap(disease_str, symptoms)
+                if overlap_score > 0.5 or primary_match > 0.6:
+                    confidence = min(0.9, confidence * 1.3)  # 30% boost for well-matching common illnesses
+            
             # Adjust confidence based on number of symptoms provided
             symptom_factor = min(1.0, len(symptoms) / 5.0)  # Scale up to 5 symptoms
             confidence = confidence * (0.4 + 0.6 * symptom_factor)
@@ -266,6 +311,18 @@ def hybrid_predict(symptoms, denied_symptoms=None):
                 confidence = max(0.01, confidence - denial_penalty)
             
             initial_confidence_scores[str(disease)] = round(confidence, 2)
+        
+        # Include our common illness match if we found one
+        if common_illness_match and common_illness_confidence > 0.5:
+            if common_illness_match in initial_confidence_scores:
+                # Blend with ML prediction
+                initial_confidence_scores[common_illness_match] = max(
+                    initial_confidence_scores[common_illness_match],
+                    common_illness_confidence * 0.8  # 80% of our heuristic confidence
+                )
+            else:
+                # Add our heuristic prediction
+                initial_confidence_scores[common_illness_match] = common_illness_confidence * 0.8
         
         # Step 3: Use Random Forest for final refinement on top prediction
         rf_prediction = None
@@ -387,10 +444,41 @@ def get_symptom_suggestions(current_symptoms=None, denied_symptoms=None, predict
     print(f"Current symptoms: {current_symptoms}")
     print(f"Denied symptoms: {denied_symptoms}")
     
-    # If no prediction available yet, suggest common initial symptoms
+    # If no prediction available yet, suggest related symptoms based on what's entered
     if not predicted_disease:
-        initial_symptoms = ["fever", "cough", "headache", "fatigue", "nausea", "rash"]
-        return [s for s in initial_symptoms if s not in current_symptoms and s not in denied_symptoms][:3]
+        # Map initial symptoms to likely related symptoms
+        symptom_relations = {
+            "cough": ["sore_throat", "runny_nose", "congestion", "fever", "headache", "shortness_of_breath"],
+            "fever": ["headache", "body_ache", "chills", "fatigue", "cough", "sweating"],
+            "headache": ["fever", "nausea", "dizziness", "fatigue", "sensitivity_to_light", "neck_pain"],
+            "rash": ["itching", "skin_redness", "swelling", "fever", "joint_pain"],
+            "diarrhea": ["nausea", "vomiting", "abdominal_pain", "fever", "dehydration"],
+            "fatigue": ["weakness", "headache", "fever", "body_ache", "loss_of_appetite"],
+            "chest_pain": ["shortness_of_breath", "cough", "fever", "sweating", "nausea"],
+            "sore_throat": ["cough", "fever", "runny_nose", "congestion", "headache"],
+            "runny_nose": ["congestion", "sneezing", "sore_throat", "cough", "headache"],
+            "joint_pain": ["muscle_pain", "swelling", "stiffness", "fever", "fatigue"],
+            "abdominal_pain": ["nausea", "vomiting", "diarrhea", "fever", "loss_of_appetite"],
+            "vomiting": ["nausea", "diarrhea", "abdominal_pain", "fever", "dehydration"]
+        }
+        
+        # If user entered a symptom we have relations for
+        related_symptoms = []
+        for symptom in current_symptoms:
+            if symptom in symptom_relations:
+                related_symptoms.extend(symptom_relations[symptom])
+        
+        # If we found related symptoms, use them, otherwise use default list
+        if related_symptoms:
+            filtered_suggestions = [s for s in related_symptoms 
+                                  if s not in current_symptoms 
+                                  and s not in denied_symptoms]
+            return filtered_suggestions[:3]
+        else:
+            initial_symptoms = ["fever", "cough", "headache", "fatigue", "nausea", "rash"]
+            return [s for s in initial_symptoms 
+                   if s not in current_symptoms 
+                   and s not in denied_symptoms][:3]
     
     # Check if prediction is medically plausible
     is_plausible = is_prediction_medically_plausible(predicted_disease, current_symptoms)
