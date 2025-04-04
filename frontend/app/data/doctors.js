@@ -1,4 +1,4 @@
-export const DOCTORS = {
+export default DOCTORS = {
     "NYC General Hospital": {
       Cardiologist: [
         { name: "Dr. Smith", image: "https://via.placeholder.com/100", availableTimes: ["10AM-11AM", "2PM-3PM"] },
