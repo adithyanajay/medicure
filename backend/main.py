@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from routes.users import router as user_router
 from routes.protected import router as protected_router
+from routes.mental_health import router as mental_health_router
 from database import check_db_connection
 from ml_model.predictor import hybrid_predict  # ✅ Import refined ML function
 
@@ -32,6 +33,7 @@ app.add_middleware(
 # Register Routes
 app.include_router(user_router, prefix="/auth", tags=["Authentication"])
 app.include_router(protected_router, prefix="/protected", tags=["Protected"])
+app.include_router(mental_health_router, prefix="/mental-health", tags=["Mental Health"])
 
 # Root API Route
 @app.get("/", tags=["Root"])

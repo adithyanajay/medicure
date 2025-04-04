@@ -1,0 +1,280 @@
+{
+  "anxiety": {
+    "message": "I understand you're feeling anxious. Let's try a simple breathing exercise together: breathe in for 4 counts, hold for 7, and exhale for 8. This can help calm your nervous system.",
+    "activities": [
+      "Practice the 4-7-8 breathing technique",
+      "Take a short walk outside",
+      "Listen to calming music",
+      "Write down your worries and challenge them"
+    ],
+    "resources": [
+      "Anxiety and Depression Association of America: https://adaa.org",
+      "Calm App: https://www.calm.com",
+      "Headspace: https://www.headspace.com"
+    ]
+  },
+  "depression": {
+    "message": "I hear that you're going through a difficult time. Your feelings are valid, and it's okay to not be okay. Remember that this feeling isn't permanent, and there are people who want to help.",
+    "activities": [
+      "Take a small step outside today",
+      "Start a gratitude journal",
+      "Reach out to a friend or family member",
+      "Do one small act of self-care"
+    ],
+    "resources": [
+      "Depression Helpline: 1-800-273-8255",
+      "BetterHelp Online Therapy: https://www.betterhelp.com",
+      "Depression Support Groups: https://www.nami.org"
+    ]
+  },
+  "crisis": {
+    "message": "I'm very concerned about your safety right now. Your life has value and there are people who want to help. If you're having thoughts of self-harm or suicide, please reach out to emergency services immediately:",
+    "activities": [
+      "🚨 Call emergency services (911) if you're in immediate danger",
+      "📞 Contact a trusted friend or family member right now",
+      "💬 Stay on the line with a crisis counselor",
+      "🏥 Go to the nearest emergency room if you feel unsafe"
+    ],
+    "resources": [
+      "National Suicide Prevention Lifeline: 988",
+      "Crisis Text Line: Text HOME to 741741",
+      "Emergency Services: 911",
+      "SAMHSA's National Helpline: 1-800-662-4357",
+      "Veterans Crisis Line: 1-800-273-8255"
+    ]
+  },
+  "loneliness": [
+    {
+      "message": "Feeling lonely can be really painful, and I want you to know that your feelings are valid. Even though I'm just a chatbot, I'm here to listen.",
+      "activities": [
+        "🤝 Join a local community group or club",
+        "📱 Reach out to an old friend",
+        "🐕 Consider volunteering at an animal shelter",
+        "📚 Join a book club or online community"
+      ],
+      "resources": [
+        "7 Cups - www.7cups.com",
+        "Meetup - www.meetup.com"
+      ]
+    }
+  ],
+  "stress": {
+    "message": "I understand that you're feeling stressed. Stress can feel overwhelming, but there are ways to manage it. Let's take a moment to focus on your breathing and identify what's within your control.",
+    "activities": [
+      "Practice deep breathing exercises",
+      "Try a 5-minute meditation",
+      "Write down your stressors and possible solutions",
+      "Take a short break and stretch",
+      "Prioritize your tasks and break them into smaller steps"
+    ],
+    "resources": [
+      "American Psychological Association Stress Management: https://www.apa.org/topics/stress",
+      "Mindful: https://www.mindful.org",
+      "Stress Management Society: https://www.stress.org.uk"
+    ]
+  },
+  "sleep": [
+    {
+      "message": "Sleep difficulties can really impact our mental well-being. I hear that you're struggling with this. Would you like to explore some gentle bedtime routine suggestions that might help you wind down?",
+      "activities": [
+        "🌙 Establish a consistent bedtime routine",
+        "📱 Reduce screen time before bed",
+        "🧘‍♀️ Try relaxation techniques",
+        "📝 Keep a sleep journal"
+      ],
+      "resources": [
+        "Sleep Foundation - www.sleepfoundation.org",
+        "Calm - www.calm.com/sleep"
+      ]
+    }
+  ],
+  "self_esteem": [
+    {
+      "message": "I hear that you're struggling with self-doubt. Your worth isn't determined by any single aspect of your life. What's one thing you're proud of, no matter how small it might seem?",
+      "activities": [
+        "💡 Write down three things you like about yourself",
+        "🎭 Try positive affirmations every morning",
+        "📓 Keep a journal of your achievements, even the small ones",
+        "🤗 Avoid comparing yourself to others online"
+      ],
+      "resources": [
+        "Self-Compassion - www.selfcompassion.org",
+        "Mind - www.mind.org.uk/self-esteem"
+      ]
+    }
+  ],
+  "panic_attack": [
+    {
+      "message": "I'm here for you. I know panic attacks can be really overwhelming, but remember: this will pass. Let's take a deep breath together.",
+      "activities": [
+        "🫁 Try the 5-4-3-2-1 grounding technique",
+        "🧘‍♂️ Practice deep breathing exercises",
+        "🎶 Listen to calming music",
+        "💧 Drink a glass of cold water"
+      ],
+      "resources": [
+        "Anxiety and Depression Association of America - www.adaa.org",
+        "Calm - www.calm.com/anxiety"
+      ]
+    }
+  ],
+  "burnout": [
+    {
+      "message": "It sounds like you've been pushing yourself really hard. Burnout can make even the simplest things feel exhausting. You deserve rest and recovery.",
+      "activities": [
+        "☕ Take regular breaks throughout the day",
+        "💤 Prioritize sleep and self-care",
+        "🎧 Listen to relaxing music or podcasts",
+        "📅 Set realistic goals and boundaries"
+      ],
+      "resources": [
+        "HelpGuide - www.helpguide.org/burnout",
+        "Mental Health Foundation - www.mentalhealth.org.uk/workplace-stress"
+      ]
+    }
+  ],
+  "grief": {
+    "message": "I'm so deeply sorry for your loss. Losing someone we love creates a profound emptiness that words can't fully capture. Please know that your grief is a reflection of the love you shared, and there's no 'right' way to feel during this time. Whether you want to talk about your loved one or just sit with these feelings, I'm here to listen.",
+    "activities": [
+      "Create a memory box with photos and mementos",
+      "Write a letter to your loved one expressing your feelings",
+      "Light a candle or visit a meaningful place in their memory",
+      "Share stories and memories with family or friends",
+      "Join a grief support group to connect with others who understand",
+      "Practice gentle self-care - it's okay to take things day by day",
+      "Consider starting a journal to process your emotions"
+    ],
+    "resources": [
+      "What's Your Grief - Support & Resources: https://whatsyourgrief.com",
+      "GriefShare - Find Local Support Groups: https://www.griefshare.org",
+      "Modern Loss - Community & Stories: https://modernloss.com",
+      "Crisis Text Line (24/7): Text HOME to 741741",
+      "Psychology Today Grief Counselor Directory: https://www.psychologytoday.com/us/therapists/grief"
+    ]
+  },
+  "study_difficulties": {
+    "message": "I understand you're having difficulties with your studies. Academic challenges can be overwhelming, but we can work through this together. Let's break down what's troubling you and find some strategies to help.",
+    "activities": [
+      "📝 Break tasks into smaller, manageable chunks",
+      "⏰ Try the Pomodoro technique (25 minutes study, 5 minutes break)",
+      "🧘‍♀️ Take regular breaks to maintain focus",
+      "📚 Create a distraction-free study environment",
+      "📋 Make a study schedule with realistic goals",
+      "🤝 Consider forming a study group",
+      "💡 Try different study methods to find what works best for you"
+    ],
+    "resources": [
+      "Khan Academy - Free Online Courses: www.khanacademy.org",
+      "Coursera - Online Learning Platform: www.coursera.org",
+      "Study Skills Resources: www.studygs.net",
+      "Academic Support Services at your institution",
+      "Forest App for Focus: www.forestapp.cc"
+    ]
+  },
+  "focus_issues": [
+    {
+      "message": "I understand that maintaining focus can be challenging. Let's explore what might be affecting your concentration.",
+      "activities": [
+        "🧘‍♀️ Try the 5-4-3-2-1 grounding technique",
+        "⏰ Use the Pomodoro technique for focused work periods",
+        "📝 Make a to-do list and prioritize tasks",
+        "🌳 Take short breaks to clear your mind"
+      ],
+      "resources": [
+        "Focus@Will - www.focusatwill.com",
+        "Forest App - www.forestapp.cc"
+      ]
+    }
+  ],
+  "anger": {
+    "message": "I hear your frustration. Anger is a natural emotion, and it's okay to feel it. Let's work on finding healthy ways to express and manage these feelings.",
+    "activities": [
+      "Take a timeout and count to 10",
+      "Write down what triggered your anger",
+      "Practice deep breathing",
+      "Go for a brisk walk",
+      "Try progressive muscle relaxation"
+    ],
+    "resources": [
+      "Anger Management Resource Center: https://www.angermanagementresource.com",
+      "American Psychological Association Anger Management: https://www.apa.org/topics/anger",
+      "Mind Tools Anger Management: https://www.mindtools.com/pages/article/newTCS_97.htm"
+    ]
+  },
+  "relationship": {
+    "message": "I understand you're going through a difficult breakup. It's completely normal to feel hurt and overwhelmed during this time. Healing takes time, and it's okay to take things one day at a time.",
+    "activities": [
+      "Write a letter expressing your feelings (but don't send it)",
+      "Spend time with friends who support you",
+      "Focus on self-care activities you enjoy",
+      "Try a new hobby or activity",
+      "Create a playlist of empowering songs"
+    ],
+    "resources": [
+      "7 Cups - Online Emotional Support: https://www.7cups.com",
+      "Psychology Today - Healing from Heartbreak: https://www.psychologytoday.com/topics/relationships",
+      "Meetup Groups for Singles: https://www.meetup.com"
+    ]
+  },
+  "study": {
+    "message": "I understand you're having difficulty with studying. Academic challenges can feel overwhelming, but let's break this down into manageable steps. Remember that everyone faces study difficulties at times, and there are effective strategies that can help you regain focus and confidence.",
+    "activities": [
+      "Use the Pomodoro Technique: 25 minutes study, 5 minutes break",
+      "Create a structured study schedule with specific goals",
+      "Find a quiet, dedicated study space",
+      "Try active recall instead of passive reading (flashcards, practice tests)",
+      "Use mind mapping to organize complex topics",
+      "Take regular breaks and get enough sleep",
+      "Join or form a study group for motivation and support",
+      "Break large tasks into smaller, manageable chunks",
+      "Experiment with different learning styles (visual, auditory, kinesthetic)"
+    ],
+    "resources": [
+      "Khan Academy - Free Educational Resources: https://www.khanacademy.org",
+      "Coursera Study Skills Course: https://www.coursera.org/learn/learning-how-to-learn",
+      "Focus@Will - Study Music: https://www.focusatwill.com",
+      "Quizlet - Study Tools: https://quizlet.com",
+      "Academic Success Center Resources: https://www.academicsuccesscenter.org",
+      "Study Skills Guide: https://www.oxfordlearning.com/study-skills-tips",
+      "Student Counseling Services - Academic Support"
+    ]
+  },
+  "study_grief": {
+    "message": "I hear that you're trying to manage your studies while dealing with grief. This is an incredibly challenging situation, and it's completely normal to struggle with focusing on academics during this time. Please know that many schools have support systems in place for students going through loss.",
+    "activities": [
+      "🎓 Contact your academic advisor about possible accommodations",
+      "📝 Break study sessions into very small, manageable chunks",
+      "🧘‍♀️ Take mindful breaks when grief feels overwhelming",
+      "📚 Find a quiet, comfortable space for studying",
+      "🤝 Consider joining a grief support group",
+      "💭 Allow yourself grace and patience with academic progress",
+      "📋 Keep a journal to track both your grief and study journey"
+    ],
+    "resources": [
+      "Student Counseling Services at your institution",
+      "Academic Support Services for special circumstances",
+      "What's Your Grief - Student Resources: https://whatsyourgrief.com/grief-at-school/",
+      "The Dougy Center - Grief Resources: www.dougy.org",
+      "Study Skills During Difficult Times: www.studygs.net/managing.htm"
+    ]
+  },
+  "general": {
+    "message": "I'm here to listen and support you. Sometimes just having someone to talk to can help. Feel free to share what's on your mind - whether it's big or small, your feelings matter.",
+    "activities": [
+      "🧘‍♀️ Take a few deep breaths together",
+      "📝 Write down your thoughts and feelings",
+      "🌳 Go for a short mindful walk",
+      "🎵 Listen to calming music",
+      "💭 Practice self-compassion exercises",
+      "☕ Have a relaxing cup of tea or water",
+      "🌅 Take a moment to pause and reset"
+    ],
+    "resources": [
+      "7 Cups - Free Online Support: www.7cups.com",
+      "Mindfulness Exercises: www.mindful.org",
+      "Self-Compassion Resources: www.self-compassion.org",
+      "Calm App for Relaxation: www.calm.com",
+      "Local Mental Health Resources"
+    ]
+  }
+}
