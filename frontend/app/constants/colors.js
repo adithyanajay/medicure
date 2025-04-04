@@ -8,6 +8,3 @@ export const COLORS = {
     white: "#ffffff",
   };
   
-// Default export to fix router warning
-export default COLORS;
-  

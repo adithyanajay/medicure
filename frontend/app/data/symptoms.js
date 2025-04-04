@@ -393,13 +393,4 @@ export const diseaseSymptomMapping = {
   "Hypothyroidism": ["fatigue", "weight_gain", "cold_sensitivity", "constipation", "dry_skin"],
   "Hyperthyroidism": ["weight_loss", "anxiety", "tremors", "increased_heart_rate", "heat_sensitivity"],
   "Hypoglycemia": ["dizziness", "confusion", "hunger", "sweating", "trembling", "anxiety"]
-};
-
-// Default export for the router to prevent warnings
-export default {
-  allSymptoms,
-  symptomSeverity,
-  followUpQuestions,
-  treatmentSuggestions,
-  diseaseSymptomMapping
 }; 

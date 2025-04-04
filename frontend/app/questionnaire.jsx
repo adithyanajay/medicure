@@ -96,6 +96,7 @@ const QuestionnaireScreen = () => {
     setError(null);
     
     try {
+      console.log('Fetching prediction for symptoms:', symptoms);
       const result = await predictDisease(symptoms, denied);
       
       // Track diagnosis changes
@@ -127,11 +128,54 @@ const QuestionnaireScreen = () => {
       }
       
     } catch (err) {
-      setError('Error getting prediction. Please try again.');
-      console.error(err);
+      console.error('API Error details:', err);
+      
+      // Set a user-friendly error message
+      setError('Connection error. Please check your network and try again.');
+      
+      // If we already have some symptoms, use a fallback prediction
+      if (symptoms.length > 0 && !currentPrediction) {
+        const fallbackPrediction = {
+          "Most Probable Disease": getFallbackDiagnosis(symptoms),
+          "Possible Alternatives": ["Unable to connect to server", "Check network connection"],
+          "Confidence": 0.3,
+          "All Confidence Scores": {"Offline Mode": 0.3}
+        };
+        
+        // Use fallback prediction to allow user to continue
+        setCurrentPrediction(fallbackPrediction);
+        setCurrentSymptomOptions(getFallbackSymptoms(symptoms));
+        setConfidence(0.3);
+        
+        if (symptoms.length >= 1 && step === 1) {
+          setStep(2);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Fallback function to suggest a basic diagnosis when offline
+  const getFallbackDiagnosis = (symptoms) => {
+    // Simple symptom matching for common conditions
+    if (symptoms.includes("cough") && (symptoms.includes("fever") || symptoms.includes("sore_throat"))) {
+      return "Common Cold (Offline Mode)";
+    } else if (symptoms.includes("headache") && symptoms.includes("nausea")) {
+      return "Migraine (Offline Mode)";
+    } else if (symptoms.includes("fever") && symptoms.includes("joint_pain")) {
+      return "Influenza (Offline Mode)";
+    } else {
+      return "Unknown Condition (Offline Mode)";
+    }
+  };
+
+  // Fallback symptoms suggestions when offline
+  const getFallbackSymptoms = (symptoms) => {
+    const commonSymptoms = ["fever", "cough", "headache", "fatigue", "sore_throat", "nausea"];
+    return commonSymptoms
+      .filter(s => !symptoms.includes(s) && !deniedSymptoms.includes(s))
+      .slice(0, 3);
   };
 
   // Handle when user selects a symptom option in step 2

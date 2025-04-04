@@ -1,8 +1,18 @@
 // API functions for MediCure
 
-// Base URL for the API
-// Change from localhost to your computer's IP address for mobile compatibility
-const API_BASE_URL = 'http://192.168.1.8:8000'; // Your computer's actual IP address
+// Base URL for the API - This detects the right URL based on environment
+const getApiBaseUrl = () => {
+  // If running in development on the web
+  if (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000';
+  }
+  
+  // For mobile app or other environments, try device's network
+  // You may need to manually update this IP address if it changes
+  return 'http://192.168.1.8:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Predicts disease based on symptoms
@@ -12,6 +22,9 @@ const API_BASE_URL = 'http://192.168.1.8:8000'; // Your computer's actual IP add
  */
 export const predictDisease = async (symptoms, deniedSymptoms = []) => {
   try {
+    console.log(`Making prediction request to: ${API_BASE_URL}/predict`);
+    console.log('Symptoms:', symptoms);
+    
     const response = await fetch(`${API_BASE_URL}/predict`, {
       method: 'POST',
       headers: {
@@ -25,10 +38,13 @@ export const predictDisease = async (symptoms, deniedSymptoms = []) => {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`Server response error: ${response.status} - ${errorText}`);
       throw new Error(`Error predicting disease: ${response.status} - ${errorText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('Prediction response:', data);
+    return data;
   } catch (error) {
     console.error('Error predicting disease:', error);
     throw error;

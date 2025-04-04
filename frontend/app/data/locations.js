@@ -12,6 +12,3 @@ export const LOCATIONS = [
       hospitals: ["Northwestern Memorial", "Rush University", "UIC Medical"],
     },
   ];
-  
-// Default export for the router to prevent warnings
-export default LOCATIONS;
