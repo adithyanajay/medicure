@@ -3,25 +3,33 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator,
 import { Stack } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 
+interface Resource {
+  text: string;
+  color: string;
+}
+
 interface Message {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   timestamp: string;
-  response?: any;
+  response?: {
+    type?: string;
+    is_emergency?: boolean;
+    content: {
+      message: string;
+      activities?: string[];
+      resources?: Resource[];
+      immediate_actions?: string[];
+    }
+  };
 }
-
-const EMERGENCY_NUMBERS = {
-  'National Suicide Prevention Lifeline': '1-800-273-8255',
-  'Crisis Text Line': 'Text HOME to 741741',
-  'SAMHSA National Helpline': '1-800-662-4357',
-  'Veterans Crisis Line': '1-800-273-8255',
-  'Trevor Project (LGBTQ+)': '1-866-488-7386'
-};
 
 const API_URL = Platform.select({
   web: 'http://localhost:8000',
-  default: 'http://10.0.2.2:8000', // Android emulator needs this special IP
+  ios: 'http://localhost:8000',
+  android: 'http://10.0.2.2:8000',
+  default: 'http://localhost:8000',
 });
 
 export default function MentalHealthScreen() {
@@ -31,7 +39,6 @@ export default function MentalHealthScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    // Add welcome message
     setMessages([
       {
         id: '0',
@@ -73,25 +80,24 @@ export default function MentalHealthScreen() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: inputText,
-        }),
+        body: JSON.stringify({ message: inputText }),
       });
 
       const data = await response.json();
-      
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: data.message,
         sender: 'bot',
         timestamp: new Date().toLocaleTimeString(),
         response: {
-          type: data.emotion,
+          type: 'general',
           is_emergency: data.is_emergency,
           content: {
             message: data.message,
-            activities: data.activities,
-            resources: data.resources
+            activities: data.suggestions,
+            resources: data.resources,
+            immediate_actions: data.immediate_actions
           }
         }
       };
@@ -113,8 +119,8 @@ export default function MentalHealthScreen() {
 
   const renderMessage = (message: Message) => {
     const isBot = message.sender === 'bot';
-    const isEmergency = message.response?.is_emergency || message.response?.type === 'crisis';
-    
+    const isEmergency = message.response?.is_emergency;
+
     return (
       <View
         key={message.id}
@@ -133,30 +139,29 @@ export default function MentalHealthScreen() {
             borderBottomRightRadius: isBot ? 16 : 4,
           }}
         >
-          <Text style={{ 
+          <Text style={{
             color: isEmergency ? '#ff0000' : (isBot ? '#000' : '#fff'),
             fontWeight: isEmergency ? 'bold' : 'normal'
           }}>
             {message.text}
           </Text>
-          
-          {/* Render activities if present */}
+
           {isBot && message.response?.content?.activities && (
-            <View style={{ 
-              marginTop: 8, 
-              borderTopWidth: 1, 
-              borderTopColor: isEmergency ? '#ff0000' : '#ddd', 
-              paddingTop: 8 
+            <View style={{
+              marginTop: 8,
+              borderTopWidth: 1,
+              borderTopColor: isEmergency ? '#ff0000' : '#ddd',
+              paddingTop: 8
             }}>
-              <Text style={{ 
-                fontWeight: '600', 
-                marginBottom: 4, 
+              <Text style={{
+                fontWeight: '600',
+                marginBottom: 4,
                 color: isEmergency ? '#ff0000' : '#444'
               }}>
                 Suggested Activities:
               </Text>
-              {message.response.content.activities.map((activity: string, index: number) => (
-                <Text key={index} style={{ 
+              {message.response.content.activities.map((activity, index) => (
+                <Text key={index} style={{
                   color: isEmergency ? '#ff0000' : '#666',
                   marginVertical: 2,
                   fontWeight: isEmergency ? '500' : 'normal'
@@ -167,48 +172,66 @@ export default function MentalHealthScreen() {
             </View>
           )}
 
-          {/* Render resources if present */}
-          {isBot && message.response?.content?.resources && (
-            <View style={{ 
-              marginTop: 8, 
-              borderTopWidth: 1, 
-              borderTopColor: isEmergency ? '#ff0000' : '#ddd', 
-              paddingTop: 8 
+          {isBot && message.response?.content?.immediate_actions && (
+            <View style={{
+              marginTop: 8,
+              borderTopWidth: 1,
+              borderTopColor: '#ff0000',
+              paddingTop: 8
             }}>
-              <Text style={{ 
-                fontWeight: '600', 
-                marginBottom: 4, 
+              <Text style={{
+                fontWeight: '600',
+                marginBottom: 4,
+                color: '#ff0000'
+              }}>
+                Immediate Actions:
+              </Text>
+              {message.response.content.immediate_actions.map((action, index) => (
+                <Text key={index} style={{
+                  color: '#ff0000',
+                  marginVertical: 2,
+                  fontWeight: '500'
+                }}>
+                  • {action}
+                </Text>
+              ))}
+            </View>
+          )}
+
+          {isBot && message.response?.content?.resources && (
+            <View style={{
+              marginTop: 8,
+              borderTopWidth: 1,
+              borderTopColor: isEmergency ? '#ff0000' : '#ddd',
+              paddingTop: 8
+            }}>
+              <Text style={{
+                fontWeight: '600',
+                marginBottom: 4,
                 color: isEmergency ? '#ff0000' : '#444'
               }}>
                 Helpful Resources:
               </Text>
-              {message.response.content.resources.map((resource: string, index: number) => {
-                // Remove HTML tags from resource text if present
-                const cleanResource = resource.replace(/<[^>]*>/g, '');
-                
-                // Extract phone number if it's an emergency number
-                const phoneMatch = cleanResource.match(/(\d{3}[-.]?\d{3}[-.]?\d{4}|\d{3})/);
+              {message.response.content.resources.map((resource, index) => {
+                const phoneMatch = resource.text.match(/(\d{3}[-.]?\d{3}[-.]?\d{4}|\d{3})/);
                 const phone = phoneMatch ? phoneMatch[0] : null;
-                
+
                 return (
-                  <Text 
-                    key={index} 
-                    style={{ 
-                      color: isEmergency ? '#ff0000' : '#0066cc',
+                  <Text
+                    key={index}
+                    style={{
+                      color: resource.color === 'red' ? '#ff0000' : '#0066cc',
                       marginVertical: 2,
-                      fontWeight: isEmergency ? '500' : 'normal',
+                      fontWeight: resource.color === 'red' ? '500' : 'normal',
                       textDecorationLine: 'underline'
                     }}
                     onPress={() => {
                       if (phone) {
                         Linking.openURL(`tel:${phone}`);
-                      } else {
-                        const url = cleanResource.split(': ')[1];
-                        if (url) Linking.openURL(url);
                       }
                     }}
                   >
-                    {cleanResource}
+                    {resource.text}
                   </Text>
                 );
               })}
@@ -231,7 +254,7 @@ export default function MentalHealthScreen() {
           headerTintColor: '#fff',
         }}
       />
-      
+
       <ScrollView
         ref={scrollViewRef}
         style={{ flex: 1, padding: 16 }}

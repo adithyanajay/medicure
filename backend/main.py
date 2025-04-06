@@ -7,6 +7,7 @@ import logging
 import traceback
 
 from ml_model.predictor import hybrid_predict, get_symptom_suggestions
+from routes.mental_health import router as mental_health_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,11 +35,16 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
+
+# Include routers
+app.include_router(mental_health_router, prefix="/mental-health", tags=["Mental Health"])
 
 @app.get("/")
 async def root():
@@ -145,7 +151,15 @@ async def startup_event():
         logger.error(traceback.format_exc())
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",  # Allow external connections
+        port=8000,
+        reload=True,     # Enable auto-reload for development
+        log_level="info",
+        access_log=True,
+        workers=1        # Single worker for development
+    )
 
 
 # This for testing
