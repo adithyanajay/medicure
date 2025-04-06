@@ -187,18 +187,19 @@
       }
     ],
     "anger": {
-      "message": "I hear your frustration. Anger is a natural emotion, and it's okay to feel it. Let's work on finding healthy ways to express and manage these feelings.",
+      "message": "I understand you're feeling angry. It's a valid emotion, and there are healthy ways to process and express it.",
       "activities": [
-        "Take a timeout and count to 10",
-        "Write down what triggered your anger",
-        "Practice deep breathing",
-        "Go for a brisk walk",
-        "Try progressive muscle relaxation"
+        "🧘‍♀️ Try deep breathing exercises",
+        "🏃‍♂️ Channel energy into physical activity",
+        "✍️ Write down your thoughts and feelings",
+        "🎵 Listen to calming music",
+        "🌳 Take a walk in nature"
       ],
       "resources": [
-        "Anger Management Resource Center: https://www.angermanagementresource.com",
-        "American Psychological Association Anger Management: https://www.apa.org/topics/anger",
-        "Mind Tools Anger Management: https://www.mindtools.com/pages/article/newTCS_97.htm"
+        "Anger Management Techniques",
+        "Stress Relief Apps",
+        "Professional Counseling Services",
+        "Meditation Resources"
       ]
     },
     "relationship": {
@@ -276,5 +277,54 @@
         "Calm App for Relaxation: www.calm.com",
         "Local Mental Health Resources"
       ]
+    },
+    "joy": {
+        "message": "Your happiness is contagious! It's wonderful to see you in such good spirits. Keep embracing these positive moments!",
+        "activities": [
+            "🎵 Create a playlist of your favorite upbeat songs",
+            "📸 Capture this moment in photos or journal",
+            "🌟 Share your joy with friends or family",
+            "🎨 Channel your positive energy into a creative activity",
+            "🌈 Plan something fun to maintain this positive momentum"
+        ],
+        "resources": [
+            "Gratitude Journal Apps",
+            "Mindfulness Apps for Positive Moments",
+            "Local Community Events and Activities",
+            "Creative Expression Platforms"
+        ]
+    },
+    "fear": {
+        "message": "Your safety is paramount. If you feel you're in immediate danger, please contact emergency services. You're not alone in this.",
+        "activities": [
+            "🚨 Contact emergency services if in danger",
+            "👥 Stay in well-lit, public areas",
+            "📱 Share your location with trusted contacts",
+            "🏢 Seek safe shelter (police station, public building)",
+            "📝 Document any concerning incidents"
+        ],
+        "resources": [
+            "Emergency Services: 911",
+            "National Emergency Hotline",
+            "Personal Safety Apps",
+            "Local Police Department",
+            "Safety Planning Resources"
+        ]
+    },
+    "achievement": {
+        "message": "Congratulations on your accomplishment! Your hard work and dedication have paid off. This is a moment to be proud of!",
+        "activities": [
+            "🎉 Celebrate your success in a meaningful way",
+            "📝 Document your achievement journey",
+            "🎯 Set new goals building on this success",
+            "💝 Share your accomplishment with supporters",
+            "🌟 Reflect on the steps that led to this success"
+        ],
+        "resources": [
+            "Goal Setting Apps",
+            "Professional Development Resources",
+            "Networking Platforms",
+            "Career Development Tools"
+        ]
     }
   }
