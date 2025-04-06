@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-  
     const loadUser = async () => {
       const storedUser = await AsyncStorage.getItem("user");
       if (storedUser) setUser(JSON.parse(storedUser));
@@ -33,3 +32,5 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+export default AuthContext;
