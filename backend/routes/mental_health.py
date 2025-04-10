@@ -20,15 +20,15 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 
-# Validate API key
-if not api_key:
+# Validate API keys
+if not openrouter_api_key:
     logger.error("OpenRouter API key not found in environment variables")
     raise ValueError("OpenRouter API key not configured")
 else:
-    # Log first few characters of key for debugging (will be removed in production)
-    logger.info(f"OpenRouter API key loaded successfully: {api_key[:8]}...")
+    logger.info(f"OpenRouter API key loaded successfully: {openrouter_api_key[:8]}...")
 
 # Rate limiting configuration
 RATE_LIMIT_DURATION = timedelta(minutes=1)  # 1 minute window
@@ -38,7 +38,7 @@ rate_limit_store = defaultdict(list)  # Store request timestamps per user
 # Initialize OpenRouter API configuration
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_HEADERS = {
-    "Authorization": f"Bearer {api_key}",
+    "Authorization": f"Bearer {openrouter_api_key}",
     "HTTP-Referer": "https://medicure.com",
     "X-Title": "MediCure Mental Health Support"
 }
@@ -80,15 +80,11 @@ conversation_memory = {}
 
 # Crisis keywords that trigger rule-based responses
 CRISIS_KEYWORDS = [
-    # Suicidal thoughts
     "suicide", "kill myself", "end my life", "want to die", "better off dead",
     "don't want to live", "take my life", "end it all", "no point in living",
-    # Self-harm
     "self-harm", "hurt myself", "cut myself", "harm myself",
-    # Severe distress
     "can't take it anymore", "everyone would be better off", "no reason to live",
     "want to disappear", "make the pain stop", "no way out",
-    # Immediate danger
     "going to kill", "plan to end", "saying goodbye", "final message"
 ]
 
@@ -146,7 +142,7 @@ def check_rate_limit(user_id: str) -> bool:
     return len(user_requests) < MAX_REQUESTS_PER_WINDOW
 
 def generate_ai_response(message: str, conversation_history: List[Dict[str, str]]) -> str:
-    """Generate a response using rule-based fallback when OpenRouter is unavailable."""
+    """Generate a response using OpenRouter API."""
     try:
         if not model_loaded:
             raise Exception("OpenRouter model not initialized")
