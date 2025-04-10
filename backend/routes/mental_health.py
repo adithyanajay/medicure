@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 import logging
@@ -272,17 +272,53 @@ def generate_response(message: str, user_id: str) -> Dict:
     ai_response = generate_ai_response(message, conversation_history)
     update_conversation_history(user_id, "assistant", ai_response)
     
+    # Extract dynamic suggestions and activities from AI response
+    dynamic_suggestions, dynamic_activities = extract_dynamic_response(ai_response)
+
     return {
         "message": ai_response,
-        "suggestions": [
-            "Would you like to tell me more about that?",
-            "How are you feeling about this?",
-            "What support would be most helpful right now?",
-            "Would you like to explore some coping strategies?"
-        ],
+        "suggestions": dynamic_suggestions,
+        "activities": dynamic_activities,
         "resources": CAMPUS_RESOURCES,
         "is_emergency": False
     }
+
+def extract_dynamic_response(ai_response: str) -> (List[str], List[str]):
+    """Extract dynamic suggestions and activities from the AI response."""
+    dynamic_suggestions = []
+    dynamic_activities = []
+
+    # Example: If the AI response contains suggestions and activities in a specific format
+    if "Consider" in ai_response:
+        # Extract suggestions
+        start = ai_response.index('[') + 1
+        end = ai_response.index(']')
+        suggestions = ai_response[start:end].split(',')
+        dynamic_suggestions = [s.strip() for s in suggestions]
+
+    if "Activities" in ai_response:
+        # Extract activities
+        start = ai_response.index('Activities:') + len('Activities:')
+        activities = ai_response[start:].split('.')
+        dynamic_activities = [a.strip() for a in activities if a.strip()]
+
+    # Default suggestions and activities if none are found
+    if not dynamic_suggestions:
+        dynamic_suggestions = [
+            "Would you like to tell me more about that?",
+            "How are you feeling about this?",
+            "What support would be most helpful right now?",
+            
+        ]
+
+    if not dynamic_activities:
+        dynamic_activities = [
+            "Take a few deep breaths.",
+            "Consider going for a short walk.",
+            "Try writing down your thoughts."
+        ]
+
+    return dynamic_suggestions, dynamic_activities
 
 @router.post("/chat")
 async def chat_with_bot(request: ChatRequest):
