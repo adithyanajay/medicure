@@ -8,6 +8,7 @@ import traceback
 
 from ml_model.predictor import hybrid_predict, get_symptom_suggestions
 from routes.mental_health import router as mental_health_router
+from routes.emergency import router as emergency_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +46,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(mental_health_router, prefix="/mental-health", tags=["Mental Health"])
+app.include_router(emergency_router, prefix="/emergency", tags=["Emergency Services"])
 
 @app.get("/")
 async def root():
