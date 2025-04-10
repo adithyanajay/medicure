@@ -53,6 +53,7 @@ export default function EmergencyScreen() {
           accuracy: Location.Accuracy.High,
         });
         locationData = location;
+        console.log(locationData);
       } catch (err) {
         console.error("Location error:", err);
         // Continue with the emergency call even if location fails
