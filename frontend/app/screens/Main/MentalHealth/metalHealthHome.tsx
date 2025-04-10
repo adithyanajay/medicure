@@ -25,12 +25,7 @@ interface Message {
   };
 }
 
-const API_URL = Platform.select({
-  web: 'http://localhost:8000',
-  ios: 'http://localhost:8000',
-  android: 'http://10.0.2.2:8000',
-  default: 'http://localhost:8000',
-});
+const API_URL = "http://192.168.1.8:8000"
 
 export default function MentalHealthScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
